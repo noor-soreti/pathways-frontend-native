@@ -1,16 +1,12 @@
 import React from 'react'
-import { StyleSheet, Text } from 'react-native'
+import { StyleSheet } from 'react-native'
 import ActionButton from 'react-native-action-button';
 import { Icon } from 'react-native-elements';
-import { Button } from '@rneui/base';
-
-
-
 
 export default function MenuComponent() {
     return (
-        <ActionButton verticalOrientation='down' buttonColor='#e35434'>
-            <ActionButton.Item buttonColor='#9b59b6' title="Maps" onPress={() => console.log("notes tapped!")}>
+        <ActionButton buttonColor='#e35434' >
+            <ActionButton.Item buttonColor='#9b59b6' title="Maps" onPress={() => console.log("notes tapped!")} >
                 <Icon name="md-create" style={styles.actionButtonIcon} />
             </ActionButton.Item>
             <ActionButton.Item buttonColor='#3498db' title="Settings" onPress={() => { }}>

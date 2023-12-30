@@ -1,44 +1,44 @@
-import React, { useEffect, useState } from 'react'
-import { Animated, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-// import { Icon } from 'react-native-elements';
-import { TextInput } from 'react-native-paper';
-// import { Icon } from '@rneui/base';
+import React, { useEffect, useRef, useState } from 'react'
+import { Animated, Pressable, StyleSheet, Text, Touchable, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
-
-
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
+import { GOOGLE_PLACES_API_KEY } from '@env'
+import Test from './test';
+import { useIsFocused } from '@react-navigation/native';
 
 
 export default function SearchComponent({ expanded = false, setExpanded }) {
 
-    const [search, setSearch] = useState('')
-
-    const [bottom] = useState(new Animated.Value(0))
+    const ref = useRef();
+    const [top] = useState(new Animated.Value(0))
+    const isFocused = useIsFocused();
 
     useEffect(() => {
-        Animated.timing(bottom, {
-            toValue: !expanded ? 80 : 10,
+        Animated.timing(top, {
+            toValue: !expanded ? 70 : 80,
             duration: 150,
             useNativeDriver: false
         }).start();
-    }, [expanded, bottom]);
-
-    const onPressInput = () => {
-        console.log(expanded);
-
-    }
+    }, [expanded, top]);
 
 
     return (
-
-        <Animated.View style={{ bottom, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
-            {/* <Icon name="ios-search" style={{ fontSize: 25, paddingRight: 10 }} /> */}
-
-            <Icon name="rocket" size={30} color="#900" />
-
-            <TextInput onPressOut={() => setExpanded(!expanded)} underlineColor='transparent' placeholder='Search' defaultValue={search} onChangeText={e => setSearch(e)} style={{
-                backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20, borderBottomLeftRadius: 20, borderBottomRightRadius: 20, width: '90%'
-            }} />
-
+        < Animated.View style={{ top }}>
+            < GooglePlacesAutocomplete
+                ref={ref}
+                placeholder='Search'
+                onPress={(data, details = null) => {
+                    // 'details' is provided when fetchDetails = true
+                    // console.log(data, details);
+                    console.log(ref.current);
+                }}
+                query={{
+                    key: GOOGLE_PLACES_API_KEY,
+                    language: 'en',
+                    components: 'country:ca'
+                }}
+            />
+            {isFocused ? (<Text>Hello</Text>) : (<Text>Hi</Text>)}
         </Animated.View>
 
     )

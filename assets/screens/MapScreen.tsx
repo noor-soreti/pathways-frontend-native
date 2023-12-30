@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Styled from 'styled-components/native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Circle, Marker } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import { Platform } from 'react-native';
+import Axios from 'axios'
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+
 
 const Container = Styled.View`
     flex: 1;
@@ -12,6 +15,8 @@ interface ILocation {
     latitude: number;
     longitude: number;
 }
+
+
 
 export default function MapScreen() {
     const [location, setLocation] = useState<ILocation | undefined>(undefined);
@@ -36,18 +41,32 @@ export default function MapScreen() {
         );
     }, []);
 
+    // use this function to pass reference 
+    function regionChange(event) {
+        setLocation({ latitude: event.latitude, longitude: event.longitude })
+        console.log(event);
+
+    }
+
+    const getData = async (reference) => {
+        const res = await Axios.get("http://localhost:3000/getData")
+        console.log(reference);
+    }
+
     return (
         <Container>
             {location && (
-                <MapView
-                    style={{ flex: 1 }}
+                <MapView onRegionChangeComplete={(e) => console.log(e)}
+                    style={{ flex: 1, height: '100%' }}
                     initialRegion={{
                         latitude: location.latitude,
                         longitude: location.longitude,
                         latitudeDelta: 0.0035,
                         longitudeDelta: 0.0021,
-                    }}>
-                    <Marker draggable
+
+                    }} showsUserLocation>
+                    {/* <Circle center={location} radius={90} strokeColor='rgba(100, 196, 251, 0.4)' fillColor='rgba(100, 196, 251, 0.4)' /> */}
+                    <Marker onDragEnd={(e) => regionChange(e.nativeEvent.coordinate)} draggable
                         coordinate={{
                             latitude: location.latitude,
                             longitude: location.longitude,

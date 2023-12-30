@@ -3,6 +3,7 @@
 .DS_Store
 
 personal.md
+.env
 
 # Xcode
 #
