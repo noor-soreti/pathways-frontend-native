@@ -1,22 +1,33 @@
-import React, { useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, TextInput, View } from 'react-native'
 import MapScreen from './MapScreen'
 import MenuComponent from '../components/MenuComponent'
 import SearchComponent from '../components/SearchComponent'
 import ExpandedComponent from '../components/ExpandedComponent'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-export default function MainScreen({ navigation }) {
+interface ILocation {
+    latitude: number;
+    longitude: number;
+}
+
+export default function MainScreen({ }) {
     const [expanded, setExpanded] = useState(false);
+    const [location, setLocation] = useState<ILocation | undefined>(undefined);
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.mapContainer}>
-                <MapScreen />
+                <MapScreen
+                    location={location}
+                    setLocation={setLocation} />
             </View>
 
             <View style={styles.searchContainer}>
-                <SearchComponent expanded={expanded} setExpanded={setExpanded} />
+                <SearchComponent
+                    expanded={expanded}
+                    setExpanded={setExpanded}
+                    setLocation={setLocation} />
             </View>
 
             <View style={styles.menuContainer}>
@@ -46,6 +57,6 @@ const styles = StyleSheet.create({
     menuContainer: {
         position: 'absolute',
         bottom: 150,
-        left: 60
+        right: 60
     },
 })

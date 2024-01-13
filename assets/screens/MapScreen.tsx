@@ -1,72 +1,80 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import Styled from 'styled-components/native';
-import MapView, { Circle, Marker } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
-import { Platform } from 'react-native';
-import Axios from 'axios'
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-
+import { KeyboardAvoidingView, Platform } from 'react-native';
 
 const Container = Styled.View`
     flex: 1;
 `;
 
-interface ILocation {
-    latitude: number;
-    longitude: number;
-}
-
-
-
-export default function MapScreen() {
-    const [location, setLocation] = useState<ILocation | undefined>(undefined);
+export default function MapScreen({ location, setLocation }) {
 
     if (Platform.OS === 'ios') {
         Geolocation.requestAuthorization("always")
     }
 
+    // Only runs after first render
     useEffect(() => {
-        Geolocation.getCurrentPosition(
-            position => {
-                const { latitude, longitude } = position.coords;
-                setLocation({
-                    latitude,
-                    longitude,
-                });
-            },
-            error => {
-                console.log(error.code, error.message);
-            },
-            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
-        );
+        if (location == undefined) {
+            Geolocation.getCurrentPosition(
+                position => {
+                    const { latitude, longitude } = position.coords;
+                    setLocation({
+                        latitude,
+                        longitude,
+                    });
+                },
+                error => {
+                    console.log(error.code, error.message);
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
+            );
+            console.log(location);
+        }
     }, []);
 
+    // Runs after first render and after dependency value (location) changes
+    useEffect(() => {
+        console.log(location);
+    }, [location])
+
     // use this function to pass reference 
-    function regionChange(event) {
-        setLocation({ latitude: event.latitude, longitude: event.longitude })
-        console.log(event);
-
-    }
-
-    const getData = async (reference) => {
-        const res = await Axios.get("http://localhost:3000/getData")
-        console.log(reference);
-    }
+    // async function regionChange(event) {
+    //     const data = await axios.get("http://localhost:3000/getData", {
+    //         params: {
+    //             latitude: event.latitude,
+    //             longitude: event.longitude
+    //         }
+    //     })
+    //         .then(res => {
+    //             console.log({ event });
+    //         })
+    //         .catch(err => {
+    //             console.log("ERROR");
+    //         })
+    //     setLocation({ latitude: event.latitude, longitude: event.longitude })
+    //     console.log(event);
+    // }
 
     return (
         <Container>
-            {location && (
-                <MapView onRegionChangeComplete={(e) => console.log(e)}
+            {location != undefined && (
+                <MapView
+                    provider={PROVIDER_GOOGLE}
+                    // onRegionChangeComplete={(e) => {
+                    //     const { latitude, longitude } = e;
+                    //     setLocation({ latitude, longitude })
+                    // }}
                     style={{ flex: 1, height: '100%' }}
+                    region={location}
                     initialRegion={{
                         latitude: location.latitude,
                         longitude: location.longitude,
-                        latitudeDelta: 0.0035,
-                        longitudeDelta: 0.0021,
-
-                    }} showsUserLocation>
-                    {/* <Circle center={location} radius={90} strokeColor='rgba(100, 196, 251, 0.4)' fillColor='rgba(100, 196, 251, 0.4)' /> */}
-                    <Marker onDragEnd={(e) => regionChange(e.nativeEvent.coordinate)} draggable
+                        latitudeDelta: 0.0105,
+                        longitudeDelta: 0.0031,
+                    }} >
+                    <Marker draggable
                         coordinate={{
                             latitude: location.latitude,
                             longitude: location.longitude,
@@ -74,6 +82,6 @@ export default function MapScreen() {
                     />
                 </MapView>
             )}
-        </Container>
+        </Container >
     );
 };
